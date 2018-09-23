@@ -10,6 +10,13 @@ var (
 	aShingles = Shingle([]string{"A spokesperson for the Sudzo Corporation revealed today that studies have shown it is good for people to buy Sudzo products."})
 	bShingles = Shingle([]string{"The Sudzo Corporation has revealed today that buying Sudzo products is good for people."})
 	cShingles = Shingle([]string{"A spokesperson from the Sudzo Corporation has made an announcement about products of corporation."})
+
+	simpleShingles = [][]string{
+		0: {"a", "d"},
+		1: {"c"},
+		2: {"b", "d", "e"},
+		3: {"a", "c", "d"},
+	}
 )
 
 func Test_ToSetsMatrix(t *testing.T) {
@@ -43,13 +50,7 @@ func Test_ToSetsMatrix(t *testing.T) {
 }
 
 func Test_ToSetsMatrix2(t *testing.T) {
-	shingles := make([][]string, 4)
-	shingles[0] = []string{"a", "d"}
-	shingles[1] = []string{"c"}
-	shingles[2] = []string{"b", "d", "e"}
-	shingles[3] = []string{"a", "c", "d"}
-
-	setsMatrix := ToSetsMatrix(shingles)
+	setsMatrix := ToSetsMatrix(simpleShingles)
 
 	// Assert that number of sets in setsMatrix is the amount of provided sets of shingles
 	assert.Equal(t, setsMatrix.setsNum, 4)
@@ -98,6 +99,38 @@ func Test_MinHash(t *testing.T) {
 		rowsNum: 5,
 		setsNum: 4,
 	}
+
+	minhash := Minhash(setsMatrix)
+
+	// Output matrix:
+	//  h  | s1 | s2 | s3 | s4
+	// h1  |  1 |  3 |  0 |  1
+	// h2  |  0 |  2 |  0 |  0
+
+	// h1 hasing function assertions
+	assert.Equal(t, 1.0, minhash[0][0])
+	assert.Equal(t, 3.0, minhash[0][1])
+	assert.Equal(t, 0.0, minhash[0][2])
+	assert.Equal(t, 1.0, minhash[0][3])
+
+	// h2 hasing function assertions
+	assert.Equal(t, 0.0, minhash[1][0])
+	assert.Equal(t, 2.0, minhash[1][1])
+	assert.Equal(t, 0.0, minhash[1][2])
+	assert.Equal(t, 0.0, minhash[1][3])
+}
+
+func Test_MinHash_EnforcesOrder(t *testing.T) {
+
+	// Input matrix:
+	// row | s1 | s2 | s3 | s4
+	//  0  |  1 |  0 |  0 |  1
+	//  1  |  0 |  0 |  1 |  0
+	//  2  |  0 |  1 |  0 |  1
+	//  3  |  1 |  0 |  1 |  1
+	//  4  |  0 |  0 |  1 |  0
+
+	setsMatrix := ToSetsComputeMatrix(simpleShingles)
 
 	minhash := Minhash(setsMatrix)
 

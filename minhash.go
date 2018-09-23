@@ -2,6 +2,7 @@ package lsh
 
 import (
 	"math"
+	"sort"
 )
 
 // SetsMatrix ...
@@ -22,7 +23,7 @@ type SetsComputeMatrix struct {
 
 // MinhashMatrix ...
 type MinhashMatrix struct {
-	m [][]int
+	m [][]float64
 }
 
 // ToSetsMatrix ...
@@ -55,14 +56,23 @@ func ToSetsMatrix(shingles [][]string) *SetsMatrix {
 // ToSetsComputeMatrix ...
 func ToSetsComputeMatrix(shingles [][]string) *SetsComputeMatrix {
 	setsMatrix := ToSetsMatrix(shingles)
-	m := make([][]bool, setsMatrix.rowsNum)
+
+	// Sort shingles for consistent comparison
+	keys := make([]string, setsMatrix.rowsNum)
 	i := 0
-	for _, row := range setsMatrix.m {
+	for key := range setsMatrix.m {
+		keys[i] = key
+		i++
+	}
+	sort.Strings(keys)
+
+	// Build optimised compute matrix
+	m := make([][]bool, setsMatrix.rowsNum)
+	for i, key := range keys {
 		m[i] = make([]bool, setsMatrix.setsNum)
-		for k, column := range row {
+		for k, column := range setsMatrix.m[key] {
 			m[i][k] = column
 		}
-		i++
 	}
 	return &SetsComputeMatrix{
 		m:       m,
