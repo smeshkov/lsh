@@ -78,6 +78,15 @@ func Test_ToSetsMatrix2(t *testing.T) {
 }
 
 func Test_MinHash(t *testing.T) {
+	
+	// Input matrix:
+	// row | s1 | s2 | s3 | s4
+	//  0  |  1 |  0 |  0 |  1
+	//  1  |  0 |  0 |  1 |  0
+	//  2  |  0 |  1 |  0 |  1
+	//  3  |  1 |  0 |  1 |  1
+	//  4  |  0 |  0 |  1 |  0
+
 	setsMatrix := &SetsComputeMatrix{
 		m: [][]bool{
 			0: []bool{true, false, false, true},
@@ -91,6 +100,11 @@ func Test_MinHash(t *testing.T) {
 	}
 
 	minhash := Minhash(setsMatrix)
+
+	// Output matrix:
+	//  h  | s1 | s2 | s3 | s4
+	// h1  |  1 |  3 |  0 |  1
+	// h2  |  0 |  2 |  0 |  0
 
 	// h1 hasing function assertions
 	assert.Equal(t, 1.0, minhash[0][0])
