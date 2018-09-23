@@ -112,7 +112,11 @@ func KShingle(lines []string, k int) []string {
 				}
 
 				sb := candidates[i]
-				sb.WriteRune(char)
+				_, err := sb.WriteRune(char)
+				if err != nil {
+					// unexpected -> panic
+					panic(err)
+				}
 
 				if sb.Len() == k {
 					// append to result shingles

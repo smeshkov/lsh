@@ -78,7 +78,7 @@ func Test_ToSetsMatrix2(t *testing.T) {
 }
 
 func Test_MinHash(t *testing.T) {
-	
+
 	// Input matrix:
 	// row | s1 | s2 | s3 | s4
 	//  0  |  1 |  0 |  0 |  1
@@ -89,11 +89,11 @@ func Test_MinHash(t *testing.T) {
 
 	setsMatrix := &SetsComputeMatrix{
 		m: [][]bool{
-			0: []bool{true, false, false, true},
-			1: []bool{false, false, true, false},
-			2: []bool{false, true, false, true},
-			3: []bool{true, false, true, true},
-			4: []bool{false, false, true, false},
+			0: {true, false, false, true},
+			1: {false, false, true, false},
+			2: {false, true, false, true},
+			3: {true, false, true, true},
+			4: {false, false, true, false},
 		},
 		rowsNum: 5,
 		setsNum: 4,

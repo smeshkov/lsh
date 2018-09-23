@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	aText = "A spokesperson for the Sudzo Corporation revealed today that studies have shown it is good for people to buy Sudzo products."
+	aText     = "A spokesperson for the Sudzo Corporation revealed today that studies have shown it is good for people to buy Sudzo products."
 	dupedText = "A spokesperson for the Sudzo Corporation. A spokesperson for the Sudzo Corporation."
 )
 
