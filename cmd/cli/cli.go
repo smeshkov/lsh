@@ -15,7 +15,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	println(lsh.KShingle(lines, 9))
+	fmt.Printf("%v\n", lsh.Shingle(lines))
 }
 
 func readStdIN() *bufio.Reader {

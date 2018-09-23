@@ -18,12 +18,14 @@ var (
 type shingler struct {
 	shingles   []string
 	candidates [][]string
+	seen       map[string]bool
 }
 
 func newShingler() *shingler {
 	return &shingler{
 		shingles:   make([]string, 0),
 		candidates: make([][]string, 0),
+		seen:       make(map[string]bool),
 	}
 }
 
@@ -48,7 +50,12 @@ func (sh *shingler) appendWord(word string) {
 
 		if len(sh.candidates[i]) == 3 {
 			// append to result shingles
-			sh.shingles = append(sh.shingles, strings.Join(sh.candidates[i], " "))
+			candidate := strings.Join(sh.candidates[i], " ")
+			// append result to candidates only if not seen before
+			if s, ok := sh.seen[candidate]; !ok && !s {
+				sh.shingles = append(sh.shingles, candidate)
+				sh.seen[candidate] = true
+			}
 			// delete from candidates
 			if i == candidatesLen-1 {
 				sh.candidates = append([][]string(nil), sh.candidates[:i]...)
@@ -88,6 +95,8 @@ func KShingle(lines []string, k int) []string {
 	shingles := make([]string, 0)
 	candidates := make([]*strings.Builder, 0)
 
+	seen := make(map[string]bool)
+
 	for _, line := range lines {
 		for _, char := range line {
 			if isPunctuationMark(char) {
@@ -106,7 +115,13 @@ func KShingle(lines []string, k int) []string {
 				sb.WriteRune(char)
 
 				if sb.Len() == k {
-					shingles = append(shingles, sb.String())
+					// append to result shingles
+					candidate := sb.String()
+					// append result to candidates only if not seen before
+					if s, ok := seen[candidate]; !ok && !s {
+						shingles = append(shingles, candidate)
+						seen[candidate] = true
+					}
 					// delete from candidates
 					if i == candidatesLen-1 {
 						candidates = append([]*strings.Builder(nil), candidates[:i]...)
