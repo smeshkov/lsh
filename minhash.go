@@ -21,12 +21,7 @@ type SetsComputeMatrix struct {
 	setsNum int
 }
 
-// MinhashMatrix ...
-type MinhashMatrix struct {
-	m [][]float64
-}
-
-// ToSetsMatrix ...
+// ToSetsMatrix returns unsorted matrix of shingles to sets.
 func ToSetsMatrix(shingles [][]string) *SetsMatrix {
 	m := make(map[string][]bool)
 
@@ -41,7 +36,8 @@ func ToSetsMatrix(shingles [][]string) *SetsMatrix {
 			if !ok {
 				m[sh] = make([]bool, setsNum)
 			}
-			// set 1 (true) for row with key==sh and column==c (column of corresponding set)
+			// set 1 (true) for row with key==sh and column==c,
+			// where "sh" is a shingle and "c" is a column of corresponding set
 			m[sh][c] = true
 		}
 	}
@@ -53,11 +49,12 @@ func ToSetsMatrix(shingles [][]string) *SetsMatrix {
 	}
 }
 
-// ToSetsComputeMatrix ...
+// ToSetsComputeMatrix returns optimised sorted matrix of shingles to sets,
+// where instead of a shingle itself it stores it's index.
 func ToSetsComputeMatrix(shingles [][]string) *SetsComputeMatrix {
 	setsMatrix := ToSetsMatrix(shingles)
 
-	// Sort shingles for consistent comparison
+	// Sort shingles for comparison consistency
 	keys := make([]string, setsMatrix.rowsNum)
 	i := 0
 	for key := range setsMatrix.m {
@@ -66,7 +63,7 @@ func ToSetsComputeMatrix(shingles [][]string) *SetsComputeMatrix {
 	}
 	sort.Strings(keys)
 
-	// Build optimised compute matrix
+	// Build optimised (only booleans) compute matrix
 	m := make([][]bool, setsMatrix.rowsNum)
 	for i, key := range keys {
 		m[i] = make([]bool, setsMatrix.setsNum)
@@ -82,41 +79,28 @@ func ToSetsComputeMatrix(shingles [][]string) *SetsComputeMatrix {
 }
 
 // Minhash ...
-func Minhash(setsMatrix *SetsComputeMatrix) [][]float64 {
+func Minhash(setsMatrix *SetsComputeMatrix, size int) [][]float64 {
 
-	minhash := make([][]float64, 2)
-	for i := 0; i < 2; i++ {
+	minhash := make([][]float64, size)
+	for i := 0; i < size; i++ {
 		minhash[i] = make([]float64, setsMatrix.setsNum)
 		for k := 0; k < setsMatrix.setsNum; k++ {
 			minhash[i][k] = math.NaN()
 		}
 	}
 
-	rNum := 0
-	for _, row := range setsMatrix.m {
+	for rNum, row := range setsMatrix.m {
 		for cNum, column := range row {
 			if column {
-				h1 := hash1(float64(rNum))
-				if math.IsNaN(minhash[0][cNum]) || minhash[0][cNum] > h1 {
-					minhash[0][cNum] = h1
-				}
-
-				h2 := hash2(float64(rNum))
-				if math.IsNaN(minhash[1][cNum]) || minhash[1][cNum] > h2 {
-					minhash[1][cNum] = h2
+				for i := 0; i < size; i++ {
+					h := hashes[i](float64(rNum))
+					if math.IsNaN(minhash[i][cNum]) || minhash[i][cNum] > h {
+						minhash[i][cNum] = h
+					}
 				}
 			}
 		}
-		rNum++
 	}
 
 	return minhash
-}
-
-func hash1(x float64) float64 {
-	return math.Mod(x+1, 5)
-}
-
-func hash2(x float64) float64 {
-	return math.Mod(3*x+1, 5)
 }
