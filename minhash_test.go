@@ -78,7 +78,7 @@ func Test_ToSetsMatrix2(t *testing.T) {
 	assert.True(t, setsMatrix.m["e"][2])
 }
 
-func Test_MinHash(t *testing.T) {
+func Test_ToSetsComputeMatrix(t *testing.T) {
 
 	// Input matrix:
 	// row | s1 | s2 | s3 | s4
@@ -88,7 +88,7 @@ func Test_MinHash(t *testing.T) {
 	//  3  |  1 |  0 |  1 |  1
 	//  4  |  0 |  0 |  1 |  0
 
-	setsMatrix := &SetsComputeMatrix{
+	expected := &SetsComputeMatrix{
 		m: [][]bool{
 			0: {true, false, false, true},
 			1: {false, false, true, false},
@@ -100,24 +100,18 @@ func Test_MinHash(t *testing.T) {
 		setsNum: 4,
 	}
 
-	minhash := Minhash(setsMatrix, 2)
+	actual := ToSetsComputeMatrix(simpleShingles)
 
-	// Output matrix:
-	//  h  | s1 | s2 | s3 | s4
-	// h1  |  1 |  3 |  0 |  1
-	// h2  |  0 |  2 |  0 |  0
+	assert.Equal(t, expected.rowsNum, actual.rowsNum)
+	assert.Equal(t, expected.setsNum, actual.setsNum)
+	assert.Equal(t, len(expected.m), len(actual.m))
 
-	// h1 hasing function assertions
-	assert.Equal(t, 1.0, minhash[0][0])
-	assert.Equal(t, 3.0, minhash[0][1])
-	assert.Equal(t, 0.0, minhash[0][2])
-	assert.Equal(t, 1.0, minhash[0][3])
-
-	// h2 hasing function assertions
-	assert.Equal(t, 0.0, minhash[1][0])
-	assert.Equal(t, 2.0, minhash[1][1])
-	assert.Equal(t, 0.0, minhash[1][2])
-	assert.Equal(t, 0.0, minhash[1][3])
+	for i, row := range expected.m {
+		assert.Equal(t, len(row), len(actual.m[i]))
+		for k, value := range row {
+			assert.Equal(t, value, actual.m[i][k])
+		}
+	}
 }
 
 func Test_MinHash_EnforcesOrder(t *testing.T) {
@@ -130,9 +124,7 @@ func Test_MinHash_EnforcesOrder(t *testing.T) {
 	//  3  |  1 |  0 |  1 |  1
 	//  4  |  0 |  0 |  1 |  0
 
-	setsMatrix := ToSetsComputeMatrix(simpleShingles)
-
-	minhash := Minhash(setsMatrix, 2)
+	minhash := Minhash(simpleShingles, 2)
 
 	// Output matrix:
 	//  h  | s1 | s2 | s3 | s4

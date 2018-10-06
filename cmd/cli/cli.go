@@ -1,57 +1,52 @@
 package main
 
 import (
-	"bufio"
+	"flag"
 	"fmt"
-	"io"
 	"os"
+	"strings"
+
+	"github.com/zoomio/inout"
 
 	"github.com/smeshkov/lsh"
 )
 
 func main() {
-	reader := readStdIN()
-	lines, err := readLines(reader)
+	source := flag.String("s", "", "Source")
+	flag.Parse()
+
+	if *source == "" {
+		flag.PrintDefaults()
+		os.Exit(0)
+	}
+
+	sources := strings.Fields(*source)
+	if len(sources) == 0 {
+		fmt.Printf("wrong source: %s", *source)
+		flag.PrintDefaults()
+		os.Exit(0)
+	}
+
+	shingleSets := make([][]string, 0)
+	for _, s := range sources {
+		shingleSets = append(shingleSets, getShingles(s))
+	}
+
+	signatureMatrix := lsh.Minhash(shingleSets, 3)
+	bandBuckets := lsh.LSH(signatureMatrix, 20)
+
+	fmt.Printf("%v\n", bandBuckets)
+}
+
+func getShingles(source string) []string {
+	reader, err := inout.New(source)
 	if err != nil {
-		panic(err)
+		fmt.Printf("can't read source %s: %v\n", source, err)
+		return []string{}
 	}
-	fmt.Printf("%v\n", lsh.Shingle(lines))
-}
-
-func readStdIN() *bufio.Reader {
-	stat, err := os.Stdin.Stat()
+	lines, err := reader.ReadLines()
 	if err != nil {
-		panic(fmt.Sprintf("error in reading from STDIN: %v", err))
+		fmt.Printf("can't fetch contents: %v\n", err)
 	}
-	if (stat.Mode() & os.ModeCharDevice) != 0 {
-		panic("unsupported mode")
-	}
-	return bufio.NewReader(os.Stdin)
-}
-
-// readLines provides slice of strings from input split by white space.
-func readLines(reader io.Reader) ([]string, error) {
-	defer close(reader)
-
-	scanner := bufio.NewScanner(reader)
-
-	var lines []string
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	if err := scanner.Err(); err != nil {
-		return nil, err
-	}
-
-	return lines, nil
-}
-
-// Close ...
-func close(reader io.Reader) {
-	if closer, ok := reader.(io.Closer); ok {
-		err := closer.Close()
-		if err != nil {
-			panic(err)
-		}
-	}
+	return lsh.Shingle(lines)
 }

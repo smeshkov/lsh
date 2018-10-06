@@ -56,15 +56,15 @@ func (bb *BandBuckets) hashToBucket(vector []float64, bandNum, setNum int) {
 	bb.bandBuckets[bandNum] = buckets
 }
 
-// LSH applies Locality Sesnitive Hashing (banded approach) onto the given signature matrix 
+// LSH applies Locality Sesnitive Hashing (banded approach) onto the given signature matrix
 // in order to find candidate pairs for similiarity.
-func LSH(signatureMatrix [][]float64, bands int, hashFunc Hash) *BandBuckets {
+func LSH(signatureMatrix [][]float64, bands int) *BandBuckets {
 	numHashes := len(signatureMatrix)
 	numSets := len(signatureMatrix[0])
 	numBuckets := numSets
 	numRows := numHashes / bands
 
-	bb := newBandedBuckets(bands, numBuckets, hashFunc)
+	bb := newBandedBuckets(bands, numBuckets, hashes[3])
 
 	for b := 0; b < bands; b++ {
 		bandVectors := make([][]float64, numSets)

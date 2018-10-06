@@ -79,10 +79,11 @@ func ToSetsComputeMatrix(shingles [][]string) *SetsComputeMatrix {
 }
 
 // Minhash ...
-func Minhash(setsMatrix *SetsComputeMatrix, size int) [][]float64 {
+func Minhash(shingles [][]string, numHashes int) [][]float64 {
+	setsMatrix := ToSetsComputeMatrix(shingles)
 
-	minhash := make([][]float64, size)
-	for i := 0; i < size; i++ {
+	minhash := make([][]float64, numHashes)
+	for i := 0; i < numHashes; i++ {
 		minhash[i] = make([]float64, setsMatrix.setsNum)
 		for k := 0; k < setsMatrix.setsNum; k++ {
 			minhash[i][k] = math.NaN()
@@ -92,7 +93,7 @@ func Minhash(setsMatrix *SetsComputeMatrix, size int) [][]float64 {
 	for rNum, row := range setsMatrix.m {
 		for cNum, column := range row {
 			if column {
-				for i := 0; i < size; i++ {
+				for i := 0; i < numHashes; i++ {
 					h := hashes[i](float64(rNum))
 					if math.IsNaN(minhash[i][cNum]) || minhash[i][cNum] > h {
 						minhash[i][cNum] = h
