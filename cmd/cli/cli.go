@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	source := flag.String("s", "", "Source")
+	source := flag.String("s", "", "List of sources separated by comma")
 	flag.Parse()
 
 	if *source == "" {
@@ -20,10 +20,9 @@ func main() {
 		os.Exit(0)
 	}
 
-	sources := strings.Fields(*source)
-	if len(sources) == 0 {
-		fmt.Printf("wrong source: %s", *source)
-		flag.PrintDefaults()
+	sources := strings.Split(*source, ",")
+	if len(sources) < 2 {
+		fmt.Println("need at least 2 documents to find similiarities")
 		os.Exit(0)
 	}
 
