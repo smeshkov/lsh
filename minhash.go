@@ -1,8 +1,10 @@
 package lsh
 
 import (
+	"fmt"
 	"math"
 	"sort"
+	"strings"
 )
 
 // SetsMatrix ...
@@ -19,6 +21,25 @@ type SetsComputeMatrix struct {
 	m       [][]bool
 	rowsNum int
 	setsNum int
+}
+
+// SignatureMatrix ...
+type SignatureMatrix [][]float64
+
+func (sm SignatureMatrix) String() string {
+	var sb strings.Builder
+	for i, row := range sm {
+		for j, column := range row {
+			if j > 0 {
+				sb.WriteString(",")
+			}
+			sb.WriteString(fmt.Sprintf("%.0f", column))
+		}
+		if i < len(sm)-1 {
+			sb.WriteString("\n")
+		}
+	}
+	return sb.String()
 }
 
 // ToSetsMatrix returns unsorted matrix of shingles to sets.
@@ -79,10 +100,10 @@ func ToSetsComputeMatrix(shingles [][]string) *SetsComputeMatrix {
 }
 
 // Minhash ...
-func Minhash(shingles [][]string, numHashes int) [][]float64 {
+func Minhash(shingles [][]string, numHashes int) SignatureMatrix {
 	setsMatrix := ToSetsComputeMatrix(shingles)
 
-	minhash := make([][]float64, numHashes)
+	minhash := make(SignatureMatrix, numHashes)
 	for i := 0; i < numHashes; i++ {
 		minhash[i] = make([]float64, setsMatrix.setsNum)
 		for k := 0; k < setsMatrix.setsNum; k++ {

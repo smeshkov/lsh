@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/zoomio/inout"
+	"github.com/zoomio/tagify/processor"
 
 	"github.com/smeshkov/lsh"
 )
@@ -32,11 +33,11 @@ func main() {
 	}
 
 	signatureMatrix := lsh.Minhash(shingleSets, 3)
+	fmt.Printf("signature matrix:\n%s\n\n", signatureMatrix)
+
 	bandBuckets := lsh.LSH(signatureMatrix, 20)
 	candidates := bandBuckets.FindCandidates()
-
-	fmt.Printf("found %d candidate pair(s):\n", len(candidates.Index))
-	fmt.Printf("%v\n", candidates.Index)
+	fmt.Printf("found %d candidate pair(s):\n%v\n\n", len(candidates.Index), candidates.Index)
 }
 
 func getShingles(source string) []string {
@@ -49,5 +50,8 @@ func getShingles(source string) []string {
 	if err != nil {
 		fmt.Printf("can't fetch contents: %v\n", err)
 	}
-	return lsh.Shingle(lines)
+
+	textLines, _ := processor.ParseHTML(lines, false, false, false)
+
+	return lsh.Shingle(textLines)
 }
