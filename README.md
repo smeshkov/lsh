@@ -5,6 +5,21 @@
 
 Finding similar items with "Locality-Sensitive Hashing". Inspired by Chapter 3: "Finding Similar Items" of "Mining Massive Datasets" book by Jure Leskovec, Anand Rajaraman and Jeff Ullman.
 
+# Check-list
+
+### Hash functions
+
+- [ ] Figure if there is a good programmatic approach to providing hash functions, e.g. define 5-10 patterns, then apply randomization
+- [ ] Increase amount to 100 functions
+
+### LSH
+
+- [ ] Write tests
+
+### Similarity
+
+TODO.
+
 ## Changelog
 
 See [CHANGELOG.md](https://raw.githubusercontent.com/smeshkov/lsh/master/CHANGELOG.md)

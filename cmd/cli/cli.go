@@ -33,8 +33,10 @@ func main() {
 
 	signatureMatrix := lsh.Minhash(shingleSets, 3)
 	bandBuckets := lsh.LSH(signatureMatrix, 20)
+	candidates := bandBuckets.FindCandidates()
 
-	fmt.Printf("%v\n", bandBuckets)
+	fmt.Printf("found %d candidate pair(s):\n", len(candidates.Index))
+	fmt.Printf("%v\n", candidates.Index)
 }
 
 func getShingles(source string) []string {
