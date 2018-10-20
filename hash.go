@@ -5,22 +5,46 @@ import (
 )
 
 // Hash is a hash function.
-type Hash func(float64) float64
+type Hash func(int, int) int
 
 var (
 	hashes = []Hash{
-		func(x float64) float64 {
-			return math.Mod(x+1, 5)
+		func(x, numBuckets int) int {
+			return (x+1) % numBuckets
 		},
-		func(x float64) float64 {
-			return math.Mod(3*x+1, 5)
+		func(x, numBuckets int) int {
+			return (3*x+1) % numBuckets
 		},
-		func(x float64) float64 {
-			return math.Mod(x, 15)
+		func(x, numBuckets int) int {
+			return (2*x+4) % numBuckets
 		},
-		func(x float64) float64 {
-			var u32 = uint32(x*31) >> 28
-			return float64(u32 & 15)
+		func(x, numBuckets int) int {
+			return (3*x-1) % numBuckets
+		},
+		func(x, numBuckets int) int {
+			return (2*x+1) % numBuckets
+		},
+		func(x, numBuckets int) int {
+			return (3*x+2) % numBuckets
+		},
+		func(x, numBuckets int) int {
+			return (5*x+2) % numBuckets
+		},
+		func(x, numBuckets int) int {
+			return x % numBuckets
+		},
+		func (x, numBuckets int) int {
+			return (31 * x + x & 0xff) % numBuckets
+		},
+		func(x, numBuckets int) int {
+			var i = (x*31) >> 28
+			return (i & 15) % numBuckets
+		},
+		func(x, numBuckets int) int {
+			return (5*x+11) % numBuckets
+		},
+		func(x, numBuckets int) int {
+			return x & math.MaxInt32 % numBuckets
 		},
 	}
 )

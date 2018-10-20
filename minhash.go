@@ -23,6 +23,26 @@ type SetsComputeMatrix struct {
 	setsNum int
 }
 
+func (scm *SetsComputeMatrix) String() string {
+	var sb strings.Builder
+	for i, row := range scm.m {
+		for j, column := range row {
+			if j > 0 {
+				sb.WriteString(",")
+			}
+			if column {
+				sb.WriteString("1")
+			} else {
+				sb.WriteString("0")
+			}
+		}
+		if i < len(scm.m)-1 {
+			sb.WriteString("\n")
+		}
+	}
+	return sb.String()
+}
+
 // SignatureMatrix ...
 type SignatureMatrix [][]float64
 
@@ -103,6 +123,9 @@ func ToSetsComputeMatrix(shingles [][]string) *SetsComputeMatrix {
 func Minhash(shingles [][]string, numHashes int) SignatureMatrix {
 	setsMatrix := ToSetsComputeMatrix(shingles)
 
+	// debug logging
+	// fmt.Printf("sets matrix:\n%v\n\n", setsMatrix)
+
 	minhash := make(SignatureMatrix, numHashes)
 	for i := 0; i < numHashes; i++ {
 		minhash[i] = make([]float64, setsMatrix.setsNum)
@@ -115,9 +138,9 @@ func Minhash(shingles [][]string, numHashes int) SignatureMatrix {
 		for cNum, column := range row {
 			if column {
 				for i := 0; i < numHashes; i++ {
-					h := hashes[i](float64(rNum))
-					if math.IsNaN(minhash[i][cNum]) || minhash[i][cNum] > h {
-						minhash[i][cNum] = h
+					h := hashes[i](rNum, setsMatrix.rowsNum)
+					if math.IsNaN(minhash[i][cNum]) || minhash[i][cNum] > float64(h) {
+						minhash[i][cNum] = float64(h)
 					}
 				}
 			}

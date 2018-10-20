@@ -14,6 +14,7 @@ import (
 
 func main() {
 	source := flag.String("s", "", "List of sources separated by comma")
+	verbose := flag.Bool("v", false, "Verbose")
 	flag.Parse()
 
 	if *source == "" {
@@ -26,18 +27,41 @@ func main() {
 		fmt.Println("need at least 2 documents to find similiarities")
 		os.Exit(0)
 	}
+	if *verbose {
+		fmt.Printf("processing sources: %v\n", sources)
+	}
 
 	shingleSets := make([][]string, 0)
 	for _, s := range sources {
-		shingleSets = append(shingleSets, getShingles(s))
+		shingles := getShingles(s)
+		// skip empty
+		if len(shingles) == 0 {
+			continue
+		}
+		shingleSets = append(shingleSets, shingles)
 	}
 
-	signatureMatrix := lsh.Minhash(shingleSets, 3)
-	fmt.Printf("signature matrix:\n%s\n\n", signatureMatrix)
+	if len(shingleSets) < 2 {
+		fmt.Printf("nothing to compare, got %d shingle set(s)\n", len(shingleSets))
+		os.Exit(0)
+	}
 
-	bandBuckets := lsh.LSH(signatureMatrix, 20)
+	if *verbose {
+		fmt.Printf("shingle sets matrix:\n%v\n\n", shingleSets)
+	}
+
+	signatureMatrix := lsh.Minhash(shingleSets, 5)
+	if *verbose {
+		fmt.Printf("signature matrix:\n%s\n\n", signatureMatrix)
+	}
+
+	bandBuckets := lsh.LSH(signatureMatrix, 1)
 	candidates := bandBuckets.FindCandidates()
-	fmt.Printf("found %d candidate pair(s):\n%v\n\n", len(candidates.Index), candidates.Index)
+
+	fmt.Printf("found %d candidate pair(s)\n", len(candidates.Index))
+	if len(candidates.Index) > 0 {
+		fmt.Printf("%v\n\n", candidates.Index)
+	}
 }
 
 func getShingles(source string) []string {
@@ -48,7 +72,8 @@ func getShingles(source string) []string {
 	}
 	lines, err := reader.ReadLines()
 	if err != nil {
-		fmt.Printf("can't fetch contents: %v\n", err)
+		fmt.Printf("can't fetch contents of %s: %v\n", source, err)
+		return []string{}
 	}
 
 	textLines, _ := processor.ParseHTML(lines, false, false, false)

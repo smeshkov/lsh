@@ -2,6 +2,7 @@ package lsh
 
 import (
 	"fmt"
+	"math"
 )
 
 // CandidatePair ...
@@ -55,13 +56,11 @@ type candidateBuckets [][]*address
 // bucket groups are separated by band.
 type BandBuckets struct {
 	bands []candidateBuckets
-	hFunc Hash
 }
 
-func newBandedBuckets(bands, buckets int, hFunc Hash) *BandBuckets {
+func newBandBuckets(bands, buckets int) *BandBuckets {
 	bb := &BandBuckets{
 		bands: make([]candidateBuckets, bands),
-		hFunc: hFunc,
 	}
 	for index := 0; index < bands; index++ {
 		bb.bands[index] = make(candidateBuckets, buckets)
@@ -69,21 +68,20 @@ func newBandedBuckets(bands, buckets int, hFunc Hash) *BandBuckets {
 	return bb
 }
 
-func (bb *BandBuckets) hashToBucket(vector []float64, bandNum, setNum int) {
-	// transform vector to int
-	h := 0.0
+// hashToBucket hashes given vector into bucket and returns hash and bucket number.
+func (bb *BandBuckets) hashToBucket(vector []float64, bandNum, setNum int) (int, int) {
+	// hash vector to int
+	var h int
 	for _, v := range vector {
-		h = h*10 + v
+		h = 31*h + (int(v) & math.MaxInt32)
 	}
-
-	// hash transformed int
-	h = bb.hFunc(h)
 
 	// get buckets for given band number
 	buckets := bb.bands[bandNum]
 
+	// hash transformed int
 	// get backet addres for candidate
-	bucketNum := int(h) % len(buckets)
+	bucketNum := h % len(buckets)
 
 	// get backet for candidate
 	cb := buckets[bucketNum]
@@ -99,6 +97,8 @@ func (bb *BandBuckets) hashToBucket(vector []float64, bandNum, setNum int) {
 
 	// update bands with updated buckets
 	bb.bands[bandNum] = buckets
+
+	return h, bucketNum
 }
 
 // FindCandidates provides slice of candidate groups,
@@ -109,7 +109,7 @@ func (bb *BandBuckets) FindCandidates() *Candidates {
 	// iterate through bands and pick up candidates for comparison from each of the bands
 	for _, band := range bb.bands {
 		for _, bucket := range band {
-			// skip buckets with none or single candidate
+			// skip buckets with zero or one candidate
 			if len(bucket) < 2 {
 				continue
 			}
@@ -129,18 +129,33 @@ func (bb *BandBuckets) FindCandidates() *Candidates {
 func LSH(signatureMatrix [][]float64, bands int) *BandBuckets {
 	numHashes := len(signatureMatrix)
 	numSets := len(signatureMatrix[0])
-	numBuckets := numSets
+	numBuckets := numHashes
 	numRows := numHashes / bands
 
-	bb := newBandedBuckets(bands, numBuckets, hashes[3])
+	// debug logging
+	// fmt.Printf("numBands %d, numHashes %d, numSets %d, numBuckets %d, numRows in band %d\n",
+	// bands, numHashes, numSets, numBuckets, numRows)
+
+	bb := newBandBuckets(bands, numBuckets)
 
 	for b := 0; b < bands; b++ {
 		bandVectors := make([][]float64, numSets)
-		for h := b * numRows; h < numHashes; h++ {
+		bandOffset := b * numRows
+		bandEnd := (b + 1) * numRows
+
+		// debug logging
+		// fmt.Printf("bandOffset %d, bandEnd %d\n",
+		// 	bandOffset, bandEnd)
+
+		for h := bandOffset; bandEnd <= numHashes && h < bandEnd; h++ {
 			for s := 0; s < numSets; s++ {
 				bandVectors[s] = append(bandVectors[s], signatureMatrix[h][s])
 			}
 		}
+
+		// debug logging
+		// fmt.Printf("bandVectors:\n%v\n\n", bandVectors)
+
 		for i, vector := range bandVectors {
 			bb.hashToBucket(vector, b, i)
 		}

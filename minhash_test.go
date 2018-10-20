@@ -37,7 +37,7 @@ func Test_ToSetsMatrix(t *testing.T) {
 	// Assert that number of sets in setsMatrix is the amount of provided sets of shingles
 	assert.Equal(t, setsMatrix.setsNum, len(shingles))
 
-	// Assert that number of rows in setsMatrix is the length of the intersection of provided sets of shingles
+	// Assert that number of rows in setsMatrix is the length of the union of provided unique sets of shingles
 	assert.Equal(t, setsMatrix.rowsNum, len(intersection))
 
 	// Assert that 1st and 2nd sets have the same entry for shingle - "is good for"
