@@ -119,19 +119,7 @@ func KShingle(lines []string, k int) []string {
 				}
 
 				if sb.Len() == k {
-					// append to result shingles
-					candidate := sb.String()
-					// append result to candidates only if not seen before
-					if s, ok := seen[candidate]; !ok && !s {
-						shingles = append(shingles, candidate)
-						seen[candidate] = true
-					}
-					// delete from candidates
-					if i == candidatesLen-1 {
-						candidates = append([]*strings.Builder(nil), candidates[:i]...)
-					} else {
-						candidates = append(candidates[:i], candidates[i+1:]...)
-					}
+					shingles, candidates = updateShingles(i, sb, seen, candidates, shingles)
 
 					candidatesLen--
 				} else {
@@ -142,6 +130,25 @@ func KShingle(lines []string, k int) []string {
 	}
 
 	return shingles
+}
+
+func updateShingles(i int, sb *strings.Builder, seenCandidates map[string]bool, candidates []*strings.Builder,
+	shingles []string) ([]string, []*strings.Builder) {
+	// append to result shingles
+	candidate := sb.String()
+	// append result to candidates only if it is not seen before
+	if s, ok := seenCandidates[candidate]; !ok && !s {
+		shingles = append(shingles, candidate)
+		seenCandidates[candidate] = true
+	}
+	// delete from candidates
+	if i == len(candidates)-1 {
+		candidates = append([]*strings.Builder(nil), candidates[:i]...)
+	} else {
+		candidates = append(candidates[:i], candidates[i+1:]...)
+	}
+
+	return shingles, candidates
 }
 
 func isPunctuationMark(char rune) bool {

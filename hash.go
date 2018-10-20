@@ -10,38 +10,38 @@ type Hash func(int, int) int
 var (
 	hashes = []Hash{
 		func(x, numBuckets int) int {
-			return (x+1) % numBuckets
+			return (x + 1) % numBuckets
 		},
 		func(x, numBuckets int) int {
-			return (3*x+1) % numBuckets
+			return (3*x + 1) % numBuckets
 		},
 		func(x, numBuckets int) int {
-			return (2*x+4) % numBuckets
+			return (2*x + 4) % numBuckets
 		},
 		func(x, numBuckets int) int {
-			return (3*x-1) % numBuckets
+			return (3*x - 1) % numBuckets
 		},
 		func(x, numBuckets int) int {
-			return (2*x+1) % numBuckets
+			return (2*x + 1) % numBuckets
 		},
 		func(x, numBuckets int) int {
-			return (3*x+2) % numBuckets
+			return (3*x + 2) % numBuckets
 		},
 		func(x, numBuckets int) int {
-			return (5*x+2) % numBuckets
+			return (5*x + 2) % numBuckets
 		},
 		func(x, numBuckets int) int {
 			return x % numBuckets
 		},
-		func (x, numBuckets int) int {
-			return (31 * x + x & 0xff) % numBuckets
+		func(x, numBuckets int) int {
+			return (31*x + x&0xff) % numBuckets
 		},
 		func(x, numBuckets int) int {
-			var i = (x*31) >> 28
+			var i = (x * 31) >> 28
 			return (i & 15) % numBuckets
 		},
 		func(x, numBuckets int) int {
-			return (5*x+11) % numBuckets
+			return (5*x + 11) % numBuckets
 		},
 		func(x, numBuckets int) int {
 			return x & math.MaxInt32 % numBuckets
