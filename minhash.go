@@ -132,6 +132,9 @@ func MinhashWithHashers(shingles [][]string, hashers []*Hasher) SignatureMatrix 
 	// fmt.Printf("sets matrix:\n%v\n\n", setsMatrix)
 
 	numHashes := len(hashers)
+	if numHashes > setsMatrix.rowsNum {
+		numHashes = setsMatrix.rowsNum
+	}
 
 	minhash := make(SignatureMatrix, numHashes)
 	for i := 0; i < numHashes; i++ {
