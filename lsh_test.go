@@ -46,7 +46,6 @@ func Test_LSH_similarCandidates(t *testing.T) {
 	buckets := LSH(Minhash(similarShingles, 5), 3)
 
 	assert.Equal(t, 1, len(buckets.FindCandidates().Index))
-	t.Errorf("%v", buckets.FindCandidates().Index)
 
 	pair, ok := buckets.FindCandidates().Index["0_2"]
 	assert.True(t, ok)

@@ -129,7 +129,7 @@ func MinhashWithHashers(shingles [][]string, hashers []*Hasher) SignatureMatrix 
 	setsMatrix := ToSetsComputeMatrix(shingles)
 
 	// debug logging
-	fmt.Printf("sets matrix:\n%v\n\n", setsMatrix)
+	// fmt.Printf("sets matrix:\n%v\n\n", setsMatrix)
 
 	numHashes := len(hashers)
 

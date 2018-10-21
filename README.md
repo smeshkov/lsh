@@ -14,8 +14,8 @@ Finding similar items with "Locality-Sensitive Hashing". Inspired by Chapter 3: 
 
 ### LSH
 
-- [ ] Write tests
-- [ ] Fix bugs
+- [x] Write tests
+- [ ] Write better tests
 
 ### Similarity
 
