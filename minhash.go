@@ -127,14 +127,10 @@ func Minhash(shingles [][]string, numHashes int) SignatureMatrix {
 // MinhashWithHashers ...
 func MinhashWithHashers(shingles [][]string, hashers []*Hasher) SignatureMatrix {
 	setsMatrix := ToSetsComputeMatrix(shingles)
+	numHashes := len(hashers)
 
 	// debug logging
 	// fmt.Printf("sets matrix:\n%v\n\n", setsMatrix)
-
-	numHashes := len(hashers)
-	if numHashes > setsMatrix.rowsNum {
-		numHashes = setsMatrix.rowsNum
-	}
 
 	minhash := make(SignatureMatrix, numHashes)
 	for i := 0; i < numHashes; i++ {
