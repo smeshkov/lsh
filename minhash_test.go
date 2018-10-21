@@ -6,19 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	aShingles = Shingle([]string{"A spokesperson for the Sudzo Corporation revealed today that studies have shown it is good for people to buy Sudzo products."})
-	bShingles = Shingle([]string{"The Sudzo Corporation has revealed today that buying Sudzo products is good for people."})
-	cShingles = Shingle([]string{"A spokesperson from the Sudzo Corporation has made an announcement about products of corporation."})
-
-	simpleShingles = [][]string{
-		0: {"a", "d"},
-		1: {"c"},
-		2: {"b", "d", "e"},
-		3: {"a", "c", "d"},
-	}
-)
-
 func Test_ToSetsMatrix(t *testing.T) {
 	shingles := make([][]string, 3)
 	shingles[0] = aShingles
@@ -124,7 +111,7 @@ func Test_MinHash_EnforcesOrder(t *testing.T) {
 	//  3  |  1 |  0 |  1 |  1
 	//  4  |  0 |  0 |  1 |  0
 
-	minhash := Minhash(simpleShingles, 2)
+	minhash := MinhashWithHashers(simpleShingles, []*Hasher{NewPatternX(1, 1), NewPatternX(3, 1)})
 
 	// Output matrix:
 	//  h  | s1 | s2 | s3 | s4

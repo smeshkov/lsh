@@ -121,10 +121,17 @@ func ToSetsComputeMatrix(shingles [][]string) *SetsComputeMatrix {
 
 // Minhash ...
 func Minhash(shingles [][]string, numHashes int) SignatureMatrix {
+	return MinhashWithHashers(shingles, GenerateHashers(numHashes))
+}
+
+// MinhashWithHashers ...
+func MinhashWithHashers(shingles [][]string, hashers []*Hasher) SignatureMatrix {
 	setsMatrix := ToSetsComputeMatrix(shingles)
 
 	// debug logging
-	// fmt.Printf("sets matrix:\n%v\n\n", setsMatrix)
+	fmt.Printf("sets matrix:\n%v\n\n", setsMatrix)
+
+	numHashes := len(hashers)
 
 	minhash := make(SignatureMatrix, numHashes)
 	for i := 0; i < numHashes; i++ {
@@ -138,7 +145,7 @@ func Minhash(shingles [][]string, numHashes int) SignatureMatrix {
 		for cNum, column := range row {
 			if column {
 				for i := 0; i < numHashes; i++ {
-					h := hashes[i](rNum, setsMatrix.rowsNum)
+					h := hashers[i].Hash()(rNum, setsMatrix.rowsNum)
 					if math.IsNaN(minhash[i][cNum]) || minhash[i][cNum] > float64(h) {
 						minhash[i][cNum] = float64(h)
 					}

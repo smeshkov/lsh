@@ -14,6 +14,7 @@ import (
 
 func main() {
 	source := flag.String("s", "", "List of sources separated by comma")
+	numHashes := flag.Int("nh", 100, "Number of hash functions")
 	verbose := flag.Bool("v", false, "Verbose")
 	flag.Parse()
 
@@ -50,7 +51,7 @@ func main() {
 		fmt.Printf("shingle sets matrix:\n%v\n\n", shingleSets)
 	}
 
-	signatureMatrix := lsh.Minhash(shingleSets, 5)
+	signatureMatrix := lsh.Minhash(shingleSets, *numHashes)
 	if *verbose {
 		fmt.Printf("signature matrix:\n%s\n\n", signatureMatrix)
 	}

@@ -9,14 +9,19 @@ Finding similar items with "Locality-Sensitive Hashing". Inspired by Chapter 3: 
 
 ### Hash functions
 
-- [ ] Figure if there is a good programmatic approach to providing hash functions, e.g. define 5-10 patterns, then apply randomization
-- [ ] Increase amount to 100 functions
+- [x] Figure if there is a good programmatic approach to providing hash functions, e.g. define 5-10 patterns, then apply randomization
+- [x] Increase amount to 100 functions
 
 ### LSH
 
 - [ ] Write tests
+- [ ] Fix bugs
 
 ### Similarity
+
+TODO.
+
+### Performance tests
 
 TODO.
 
