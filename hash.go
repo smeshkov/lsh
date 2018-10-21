@@ -72,7 +72,7 @@ func GenerateHashers(amount int) []*Hasher {
 			multipier = toOdd(k % amount)
 		}
 
-		hashFunc := NewMaxInt(multipier)
+		hashFunc := NewAnd(multipier)
 		if seen[hashFunc.String()] {
 			continue
 		}
@@ -123,13 +123,13 @@ func NewPatternX(multipier, coefficient int) *Hasher {
 	}
 }
 
-// NewMaxInt creates new hash function with provided multipier based with maximum integer as one of coefficients.
-func NewMaxInt(multipier int) *Hasher {
+// NewAnd creates new hash function with provided multipier which applies bitwise AND.
+func NewAnd(multipier int) *Hasher {
 	return &Hasher{
 		hf: func(x, numBuckets int) int {
-			return (multipier*x + x&math.MaxInt32) % numBuckets
+			return int(math.Abs(float64((multipier*x + x&math.MaxInt32) % numBuckets)))
 		},
-		t: fmt.Sprintf("(%d * x + x & math.MaxInt32) mod numBuckets", multipier),
+		t: fmt.Sprintf("(%d * x + x & maxInt) mod numBuckets", multipier),
 	}
 }
 

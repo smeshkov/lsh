@@ -90,19 +90,19 @@ func (bb *BandBuckets) hashToBucket(vector []float64, bandNum, setNum int) (int,
 
 	// hash transformed int
 	// get backet addres for candidate
-	bucketNum := h % len(buckets)
+	bucketNum := int(math.Abs(float64(h % len(buckets))))
 
 	// get backet for candidate
-	cb := buckets[bucketNum]
+	candidateBucket := buckets[bucketNum]
 
 	// append candidate details to bucket
-	cb = append(cb, &address{
+	candidateBucket = append(candidateBucket, &address{
 		bandNum: bandNum,
 		setNum:  setNum,
 	})
 
 	// put apdated list of candidates into bucket
-	buckets[bucketNum] = cb
+	buckets[bucketNum] = candidateBucket
 
 	// update bands with updated buckets
 	bb.bands[bandNum] = buckets

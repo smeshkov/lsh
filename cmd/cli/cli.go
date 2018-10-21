@@ -12,51 +12,68 @@ import (
 	"github.com/smeshkov/lsh"
 )
 
+var (
+	// lsh command
+	lshCmd       = flag.NewFlagSet("lsh", flag.ExitOnError)
+	lshSources   = lshCmd.String("s", "", "List of sources separated by comma.")
+	lshNumHashes = lshCmd.Int("nh", 100, "Number of hash functions.")
+
+	// similarity command
+	simCmd     = flag.NewFlagSet("sim", flag.ExitOnError)
+	simSources = simCmd.String("s", "", "List of sources separated by comma.")
+)
+
 func main() {
-	source := flag.String("s", "", "List of sources separated by comma")
-	numHashes := flag.Int("nh", 100, "Number of hash functions")
-	// verbose := flag.Bool("v", false, "Verbose")
-	flag.Parse()
-
-	if *source == "" {
-		flag.PrintDefaults()
-		os.Exit(0)
+	// Verify that a subcommand has been provided
+	// os.Arg[0] is the main command
+	// os.Arg[1] will be the subcommand
+	if len(os.Args) < 2 {
+		printUsage()
+		os.Exit(1)
 	}
 
-	sources := strings.Split(*source, ",")
-	if len(sources) < 2 {
-		fmt.Println("need at least 2 documents to find similiarities")
-		os.Exit(0)
+	cmd := os.Args[1]
+	for strings.HasPrefix(cmd, "-") {
+		cmd = strings.TrimPrefix(cmd, "-")
 	}
-	fmt.Printf("shingling %d sources:\n", len(sources))
-
-	shingleSets := make([][]string, 0)
-	var k int
-	for _, s := range sources {
-		shingles := getShingles(s)
-		// skip empty
-		if len(shingles) == 0 {
-			fmt.Printf("---> skipping %s: no shingles\n", s)
-			continue
-		}
-		shingleSets = append(shingleSets, shingles)
-		fmt.Printf("[%d]: %s - %.150s\n", k, s, shingles[0])
-		k++
+	if cmd == "help" || cmd == "h" {
+		printUsage()
+		os.Exit(1)
 	}
 
-	if len(shingleSets) < 2 {
-		fmt.Printf("nothing to compare, got %d shingle set(s)\n", len(shingleSets))
-		os.Exit(0)
+	switch cmd {
+	case lshCmd.Name():
+		parseCommand(lshCmd)
+		doLSH()
+	case simCmd.Name():
+		parseCommand(simCmd)
+		doSim()
+	default:
+		fmt.Printf("unknown: %s\n", cmd)
+		os.Exit(2)
 	}
-	fmt.Printf("\nhashing %d sets\n\n", len(shingleSets))
+}
 
-	signatureMatrix := lsh.Minhash(shingleSets, *numHashes)
-	bandBuckets := lsh.LSH(signatureMatrix, 1)
-	candidates := bandBuckets.FindCandidates()
+func printDefaults(cmd *flag.FlagSet) {
+	println(cmd.Name())
+	cmd.PrintDefaults()
+}
 
-	fmt.Printf("found %d candidate pair(s)\n", len(candidates.Index))
-	if len(candidates.Index) > 0 {
-		fmt.Printf("%v\n\n", candidates.Keys())
+func printUsage() {
+	println("Usage:")
+	println()
+	printDefaults(lshCmd)
+	println()
+	printDefaults(simCmd)
+	println()
+}
+
+func parseCommand(cmd *flag.FlagSet) {
+	err := cmd.Parse(os.Args[2:])
+	if err != nil {
+		fmt.Printf("error in parsing arguments: %v \n", err)
+		printDefaults(cmd)
+		os.Exit(3)
 	}
 }
 
@@ -75,4 +92,61 @@ func getShingles(source string) []string {
 	textLines, _ := processor.ParseHTML(lines, false, false, false)
 
 	return lsh.Shingle(textLines)
+}
+
+func shingleSets(sources string) [][]string {
+	if sources == "" {
+		printUsage()
+		os.Exit(4)
+	}
+
+	sourcesList := strings.Split(sources, ",")
+	if len(sources) < 2 {
+		fmt.Println("need at least 2 documents to find similiarities")
+		os.Exit(0)
+	}
+	fmt.Printf("shingling %d sources:\n", len(sourcesList))
+
+	shingleSets := make([][]string, 0)
+	var k int
+	for _, s := range sourcesList {
+		shingles := getShingles(s)
+		// skip empty
+		if len(shingles) == 0 {
+			fmt.Printf("---> skipping %s: no shingles\n", s)
+			continue
+		}
+		shingleSets = append(shingleSets, shingles)
+		fmt.Printf("[%d]: %s - %.150s\n", k, s, shingles[0])
+		k++
+	}
+	return shingleSets
+}
+
+func doLSH() {
+	shingleSets := shingleSets(*lshSources)
+	if len(shingleSets) < 2 {
+		fmt.Printf("nothing to compare, got %d shingle set(s)\n", len(shingleSets))
+		os.Exit(0)
+	}
+	fmt.Printf("\nhashing %d sets\n\n", len(shingleSets))
+
+	signatureMatrix := lsh.Minhash(shingleSets, *lshNumHashes)
+	bandBuckets := lsh.LSH(signatureMatrix, 1)
+	candidates := bandBuckets.FindCandidates()
+
+	fmt.Printf("found %d candidate pair(s)\n", len(candidates.Index))
+	if len(candidates.Index) > 0 {
+		fmt.Printf("%v\n", candidates.Keys())
+	}
+}
+
+func doSim() {
+	shingleSets := shingleSets(*simSources)
+	if len(shingleSets) != 2 {
+		fmt.Println("you can compare only 2 sets")
+		os.Exit(0)
+	}
+
+	fmt.Printf("similarity: %.4f\n", lsh.Jaccard(shingleSets[0], shingleSets[1]))
 }
