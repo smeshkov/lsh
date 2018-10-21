@@ -45,6 +45,15 @@ func (c *Candidates) Put(a, b int) {
 	}
 }
 
+// Keys returns just keys of candidate pairs, useful for debugging or just printing to STDIN.
+func (c *Candidates) Keys() []string {
+	var keys []string
+	for key := range c.Index {
+		keys = append(keys, key)
+	}
+	return keys
+}
+
 type address struct {
 	bandNum int
 	setNum  int

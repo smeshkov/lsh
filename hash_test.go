@@ -22,6 +22,15 @@ func Test_generatesUniqueHashers(t *testing.T) {
 	}
 }
 
+func Test_modulusIs1st(t *testing.T) {
+	hashers := GenerateHashers(1)
+
+	// make sure we generated 1 hasher
+	assert.Len(t, hashers, 1)
+
+	assert.Equal(t, Modulus.String(), hashers[0].String())
+}
+
 func Test_PatternX(t *testing.T) {
 	hash1 := NewPatternX(1, 1)
 

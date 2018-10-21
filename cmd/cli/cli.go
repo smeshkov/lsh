@@ -28,11 +28,13 @@ func main() {
 		fmt.Println("need at least 2 documents to find similiarities")
 		os.Exit(0)
 	}
+
 	if *verbose {
-		fmt.Printf("processing sources: %v\n", sources)
+		fmt.Printf("processing sources %d:\n", len(sources))
 	}
 
 	shingleSets := make([][]string, 0)
+	var k int
 	for _, s := range sources {
 		shingles := getShingles(s)
 		// skip empty
@@ -40,6 +42,10 @@ func main() {
 			continue
 		}
 		shingleSets = append(shingleSets, shingles)
+		if *verbose {
+			fmt.Printf("[%d]: %s - %.150s\n", k, s, shingles[0])
+		}
+		k++
 	}
 
 	if len(shingleSets) < 2 {
@@ -47,21 +53,21 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *verbose {
-		fmt.Printf("shingle sets matrix:\n%v\n\n", shingleSets)
-	}
+	// if *verbose {
+	// 	fmt.Printf("shingle sets matrix:\n%v\n\n", shingleSets)
+	// }
 
 	signatureMatrix := lsh.Minhash(shingleSets, *numHashes)
-	if *verbose {
-		fmt.Printf("signature matrix:\n%s\n\n", signatureMatrix)
-	}
+	// if *verbose {
+	// 	fmt.Printf("signature matrix:\n%s\n\n", signatureMatrix)
+	// }
 
 	bandBuckets := lsh.LSH(signatureMatrix, 1)
 	candidates := bandBuckets.FindCandidates()
 
 	fmt.Printf("found %d candidate pair(s)\n", len(candidates.Index))
 	if len(candidates.Index) > 0 {
-		fmt.Printf("%v\n\n", candidates.Index)
+		fmt.Printf("%v\n\n", candidates.Keys())
 	}
 }
 
