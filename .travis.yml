@@ -1,20 +1,20 @@
 language: go
 
 go:
-- 1.11.x
+  - 1.11.x
 
 env:
-- GO111MODULE=on
+  - GO111MODULE=on
 
 install:
-- go get -v ./...
+  - go get -v ./...
 
 script:
 - "./_bin/test.sh"
 
 before_deploy:
-- "./_bin/build.sh darwin ${TRAVIS_TAG}"
-- "./_bin/build.sh linux ${TRAVIS_TAG}"
+  - "./_bin/build.sh darwin ${TRAVIS_TAG}"
+  - "./_bin/build.sh linux ${TRAVIS_TAG}"
 
 deploy:
   provider: releases
@@ -23,5 +23,6 @@ deploy:
   file:
     - "lsh_darwin_$TRAVIS_TAG"
     - "lsh_linux_$TRAVIS_TAG"
+  skip_cleanup: true
   on:
     tags: true
