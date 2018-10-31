@@ -19,8 +19,9 @@ var (
 	lshNumHashes = lshCmd.Int("nh", 100, "Number of hash functions.")
 
 	// similarity command
-	simCmd     = flag.NewFlagSet("sim", flag.ExitOnError)
-	simSources = simCmd.String("s", "", "List of sources separated by comma.")
+	simCmd       = flag.NewFlagSet("sim", flag.ExitOnError)
+	simSources   = simCmd.String("s", "", "List of sources separated by comma.")
+	simKShingles = simCmd.Int("k", 9, "Number of shingles for K-shingling approach.")
 )
 
 func main() {
@@ -77,7 +78,7 @@ func parseCommand(cmd *flag.FlagSet) {
 	}
 }
 
-func getShingles(source string) []string {
+func getShingles(source string, doKShingle bool) []string {
 	reader, err := inout.New(source)
 	if err != nil {
 		fmt.Printf("can't read source %s: %v\n", source, err)
@@ -91,10 +92,14 @@ func getShingles(source string) []string {
 
 	textLines, _ := processor.ParseHTML(lines, false, false, false)
 
+	if doKShingle {
+		return lsh.KShingle(textLines, *simKShingles)
+	}
+
 	return lsh.Shingle(textLines)
 }
 
-func shingleSets(sources string) [][]string {
+func shingleSets(sources string, doKShingle bool) [][]string {
 	if sources == "" {
 		printUsage()
 		os.Exit(4)
@@ -110,7 +115,7 @@ func shingleSets(sources string) [][]string {
 	shingleSets := make([][]string, 0)
 	var k int
 	for _, s := range sourcesList {
-		shingles := getShingles(s)
+		shingles := getShingles(s, doKShingle)
 		// skip empty
 		if len(shingles) == 0 {
 			fmt.Printf("---> skipping %s: no shingles\n", s)
@@ -124,7 +129,7 @@ func shingleSets(sources string) [][]string {
 }
 
 func doLSH() {
-	shingleSets := shingleSets(*lshSources)
+	shingleSets := shingleSets(*lshSources, false)
 	if len(shingleSets) < 2 {
 		fmt.Printf("nothing to compare, got %d shingle set(s)\n", len(shingleSets))
 		os.Exit(0)
@@ -142,7 +147,7 @@ func doLSH() {
 }
 
 func doSim() {
-	shingleSets := shingleSets(*simSources)
+	shingleSets := shingleSets(*simSources, true)
 	if len(shingleSets) != 2 {
 		fmt.Println("you can compare only 2 sets")
 		os.Exit(0)
