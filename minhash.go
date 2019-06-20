@@ -28,25 +28,19 @@ func (scm *SetsComputeMatrix) String() string {
 	for i, row := range scm.m {
 		for j, column := range row {
 			if j > 0 {
-				scm.checkError(sb.WriteString(","))
+				checkWriteStringError(sb.WriteString(","))
 			}
 			if column {
-				scm.checkError(sb.WriteString("1"))
+				checkWriteStringError(sb.WriteString("1"))
 			} else {
-				scm.checkError(sb.WriteString("0"))
+				checkWriteStringError(sb.WriteString("0"))
 			}
 		}
 		if i < len(scm.m)-1 {
-			scm.checkError(sb.WriteString("\n"))
+			checkWriteStringError(sb.WriteString("\n"))
 		}
 	}
 	return sb.String()
-}
-
-func (scm *SetsComputeMatrix) checkError(ignored int, err error) {
-	if err != nil {
-		panic(fmt.Sprintf("error in building a string from SetsComputeMatrix: %v", err))
-	}
 }
 
 // SignatureMatrix ...
@@ -57,12 +51,12 @@ func (sm SignatureMatrix) String() string {
 	for i, row := range sm {
 		for j, column := range row {
 			if j > 0 {
-				sb.WriteString(",")
+				checkWriteStringError(sb.WriteString(","))
 			}
-			sb.WriteString(fmt.Sprintf("%.0f", column))
+			checkWriteStringError(sb.WriteString(fmt.Sprintf("%.0f", column)))
 		}
 		if i < len(sm)-1 {
-			sb.WriteString("\n")
+			checkWriteStringError(sb.WriteString("\n"))
 		}
 	}
 	return sb.String()
@@ -162,4 +156,10 @@ func MinhashWithHashers(shingles [][]string, hashers []*Hasher) SignatureMatrix 
 	}
 
 	return minhash
+}
+
+func checkWriteStringError(ignored int, err error) {
+	if err != nil {
+		panic(fmt.Sprintf("error in building a string from SetsComputeMatrix: %v", err))
+	}
 }

@@ -115,7 +115,7 @@ func KShingle(lines []string, k int) []string {
 				}
 
 				if sb.Len() == k {
-					shingles, candidates = updateShingles(i, sb, seen, candidates, shingles)
+					shingles, candidates = updateShingles(i, sb.String(), seen, candidates, shingles)
 
 					candidatesLen--
 				} else {
@@ -128,10 +128,8 @@ func KShingle(lines []string, k int) []string {
 	return shingles
 }
 
-func updateShingles(i int, sb *strings.Builder, seenCandidates map[string]bool, candidates []*strings.Builder,
+func updateShingles(i int, candidate string, seenCandidates map[string]bool, candidates []*strings.Builder,
 	shingles []string) ([]string, []*strings.Builder) {
-	// append to result shingles
-	candidate := sb.String()
 	// append result to candidates only if it is not seen before
 	if s, ok := seenCandidates[candidate]; !ok && !s {
 		shingles = append(shingles, candidate)

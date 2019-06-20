@@ -28,7 +28,7 @@ func (h *Hasher) String() string {
 	return h.t
 }
 
-// GenerateHashers ...
+// GenerateHashers generates hash functions for given amount.
 func GenerateHashers(amount int) []*Hasher {
 	hashers := make([]*Hasher, amount)
 	seen := make(map[string]bool)
