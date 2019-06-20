@@ -7,10 +7,6 @@ import (
 	"github.com/zoomio/stopwords"
 )
 
-const (
-	defaultK = 5
-)
-
 var (
 	punctuationMarks = regexp.MustCompile(`[.,:;?!]+`)
 )

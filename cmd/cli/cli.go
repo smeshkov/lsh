@@ -44,11 +44,9 @@ func main() {
 
 	switch cmd {
 	case lshCmd.Name():
-		parseCommand(lshCmd)
-		doLSH()
+		doLSH(lshCmd)
 	case simCmd.Name():
-		parseCommand(simCmd)
-		doSim()
+		doSim(simCmd)
 	default:
 		fmt.Printf("unknown: %s\n", cmd)
 		os.Exit(2)
@@ -107,7 +105,7 @@ func shingleSets(sources string, doKShingle bool) [][]string {
 
 	sourcesList := strings.Split(sources, ",")
 	if len(sources) < 2 {
-		fmt.Println("need at least 2 documents to find similiarities")
+		fmt.Println("need at least 2 documents to find candidates")
 		os.Exit(0)
 	}
 	fmt.Printf("shingling %d sources:\n", len(sourcesList))
@@ -128,7 +126,9 @@ func shingleSets(sources string, doKShingle bool) [][]string {
 	return shingleSets
 }
 
-func doLSH() {
+func doLSH(cmd *flag.FlagSet) {
+	parseCommand(cmd)
+
 	shingleSets := shingleSets(*lshSources, false)
 	if len(shingleSets) < 2 {
 		fmt.Printf("nothing to compare, got %d shingle set(s)\n", len(shingleSets))
@@ -146,7 +146,9 @@ func doLSH() {
 	}
 }
 
-func doSim() {
+func doSim(cmd *flag.FlagSet) {
+	parseCommand(cmd)
+
 	shingleSets := shingleSets(*simSources, true)
 	if len(shingleSets) != 2 {
 		fmt.Println("you can compare only 2 sets")

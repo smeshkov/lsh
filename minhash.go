@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// SetsMatrix ...
+// SetsMatrix contains index of shingles to sets.
 type SetsMatrix struct {
 	m       map[string][]bool
 	rowsNum int
@@ -28,19 +28,25 @@ func (scm *SetsComputeMatrix) String() string {
 	for i, row := range scm.m {
 		for j, column := range row {
 			if j > 0 {
-				sb.WriteString(",")
+				scm.checkError(sb.WriteString(","))
 			}
 			if column {
-				sb.WriteString("1")
+				scm.checkError(sb.WriteString("1"))
 			} else {
-				sb.WriteString("0")
+				scm.checkError(sb.WriteString("0"))
 			}
 		}
 		if i < len(scm.m)-1 {
-			sb.WriteString("\n")
+			scm.checkError(sb.WriteString("\n"))
 		}
 	}
 	return sb.String()
+}
+
+func (scm *SetsComputeMatrix) checkError(ignored int, err error) {
+	if err != nil {
+		panic(fmt.Sprintf("error in building a string from SetsComputeMatrix: %v", err))
+	}
 }
 
 // SignatureMatrix ...
@@ -119,12 +125,14 @@ func ToSetsComputeMatrix(shingles [][]string) *SetsComputeMatrix {
 	}
 }
 
-// Minhash ...
+// Minhash performs minhashing operations on the given shingles,
+// with the given number (`numHashes`) of generated hashes functions.
 func Minhash(shingles [][]string, numHashes int) SignatureMatrix {
 	return MinhashWithHashers(shingles, GenerateHashers(numHashes))
 }
 
-// MinhashWithHashers ...
+// MinhashWithHashers performs minhashing operations on the given shingles,
+// with the given hashes functions.
 func MinhashWithHashers(shingles [][]string, hashers []*Hasher) SignatureMatrix {
 	setsMatrix := ToSetsComputeMatrix(shingles)
 	numHashes := len(hashers)
