@@ -108,9 +108,7 @@ func ToSetsComputeMatrix(shingles [][]string) *SetsComputeMatrix {
 	m := make([][]bool, setsMatrix.rowsNum)
 	for i, key := range keys {
 		m[i] = make([]bool, setsMatrix.setsNum)
-		for k, column := range setsMatrix.m[key] {
-			m[i][k] = column
-		}
+		copy(m[i], setsMatrix.m[key])
 	}
 	return &SetsComputeMatrix{
 		m:       m,
