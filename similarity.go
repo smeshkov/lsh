@@ -1,6 +1,11 @@
 package lsh
 
-// Jaccard ...
+// Jaccard - jaccard index, also known as Intersection over Union 
+// and the Jaccard similarity coefficient.
+//
+// Formulae:
+// J(A, B) = Intersection(A, B) / Union(A, B)
+//
 func Jaccard(a, b []string) float64 {
 	setA := make(map[string]bool)
 	setB := make(map[string]bool)

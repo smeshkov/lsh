@@ -54,7 +54,7 @@ similarity: 1.0000
 
 ### Similarity
 
-TODO.
+- [x] Jaccard
 
 ### Performance tests
 
