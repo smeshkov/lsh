@@ -1,6 +1,6 @@
 package lsh
 
-// Jaccard - jaccard index, also known as Intersection over Union 
+// Jaccard - jaccard index, also known as Intersection over Union
 // and the Jaccard similarity coefficient.
 //
 // Formulae:

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/zoomio/inout"
+	"github.com/zoomio/tagify"
 	"github.com/zoomio/tagify/processor"
 
 	"github.com/smeshkov/lsh"
@@ -88,7 +89,7 @@ func getShingles(source string, doKShingle bool) []string {
 		return []string{}
 	}
 
-	textLines, _ := processor.ParseHTML(lines, false, false, false)
+	textLines := tagify.ToStrings(processor.ParseHTML(lines, false, false))
 
 	if doKShingle {
 		return lsh.KShingle(textLines, *simKShingles)
