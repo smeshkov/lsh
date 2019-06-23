@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 0.6.0
+ - changes to CLI: use raw text lines of provided sources instead of tags from given sources.
+
 ## 0.5.0
  - use K-shingling instead of stop-word based shingling for similarity comparison in CLI.
 
