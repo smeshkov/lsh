@@ -28,6 +28,33 @@ func (h *Hasher) String() string {
 	return h.t
 }
 
+// SuggestHashNum suggests number of generated hashes based on the average number of shingles.
+func SuggestHashNum(avgNumOfShingles int) int {
+	if avgNumOfShingles <= 100 {
+		return 5
+	} else if avgNumOfShingles > 100 && avgNumOfShingles <= 150 {
+		return 10
+	} else if avgNumOfShingles > 150 && avgNumOfShingles <= 300 {
+		return 20
+	} else if avgNumOfShingles > 300 && avgNumOfShingles <= 400 {
+		return 30
+	} else if avgNumOfShingles > 400 && avgNumOfShingles <= 550 {
+		return 40
+	} else if avgNumOfShingles > 550 && avgNumOfShingles <= 700 {
+		return 50
+	} else if avgNumOfShingles > 700 && avgNumOfShingles <= 800 {
+		return 60
+	} else if avgNumOfShingles > 800 && avgNumOfShingles <= 900 {
+		return 70
+	} else if avgNumOfShingles > 900 && avgNumOfShingles <= 1000 {
+		return 80
+	} else if avgNumOfShingles > 1000 && avgNumOfShingles <= 1200 {
+		return 90
+	}
+
+	return 100
+}
+
 // GenerateHashers generates hash functions for given amount.
 func GenerateHashers(amount int) []*Hasher {
 	hashers := make([]*Hasher, amount)

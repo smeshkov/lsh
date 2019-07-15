@@ -42,23 +42,9 @@ similarity: 1.0000
 
 # Check-list
 
-### Hash functions
-
-- [x] Figure if there is a good programmatic approach to providing hash functions, e.g. define 5-10 patterns, then apply randomization
-- [x] Increase amount to 100 functions
-
-### LSH
-
-- [x] Write tests
-- [ ] Write better tests
-
 ### Similarity
 
 - [x] Jaccard
-
-### Examples
-
-- [ ] add example use cases as a `main.go` files into the repo
 
 ### Performance tests
 

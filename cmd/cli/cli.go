@@ -13,10 +13,16 @@ import (
 )
 
 var (
+	// shingle command
+	shingleCmd    = flag.NewFlagSet("shingle", flag.ExitOnError)
+	shingleSource = shingleCmd.String("s", "", "Sources of the text.")
+	shingleK      = shingleCmd.Bool("k", false, "Enables K-shingling.")
+
 	// LSH command
 	lshCmd       = flag.NewFlagSet("lsh", flag.ExitOnError)
 	lshSources   = lshCmd.String("s", "", "List of sources separated by comma.")
-	lshNumHashes = lshCmd.Int("nh", 100, "Number of hash functions.")
+	lshNumHashes = lshCmd.Int("hashes", 0, "Number of hash functions.")
+	lshNumBands  = lshCmd.Int("bands", 0, "Number of bands.")
 
 	// similarity command
 	simCmd       = flag.NewFlagSet("sim", flag.ExitOnError)
@@ -43,6 +49,8 @@ func main() {
 	}
 
 	switch cmd {
+	case shingleCmd.Name():
+		doShingles(shingleCmd)
 	case lshCmd.Name():
 		doLSH(lshCmd)
 	case simCmd.Name():
@@ -86,11 +94,12 @@ func getShingles(source string, doKShingle bool) []string {
 	return lsh.Shingle(textLines)
 }
 
-func shingleSets(sourcesList []string, doKShingle bool) [][]string {
-	fmt.Printf("shingling %d sources:\n", len(sourcesList))
+func shingleSets(sourcesList []string, doKShingle bool) ([][]string, int) {
+	fmt.Printf("\nshingling %d sources:\n", len(sourcesList))
 
 	shingleSets := make([][]string, 0)
 	var k int
+	var totalSize int
 	for _, s := range sourcesList {
 		shingles := getShingles(s, doKShingle)
 		// skip empty
@@ -98,28 +107,55 @@ func shingleSets(sourcesList []string, doKShingle bool) [][]string {
 			fmt.Printf("---> skipping %s: no shingles\n", s)
 			continue
 		}
+		totalSize += len(shingles)
 		shingleSets = append(shingleSets, shingles)
 		fmt.Printf("[%d]: %s - %.150s\n", k, s, shingles[0])
 		k++
 	}
-	return shingleSets
+	return shingleSets, totalSize / len(shingleSets)
+}
+
+func doShingles(cmd *flag.FlagSet) {
+	parseCommand(cmd)
+	shingles := getShingles(*shingleSource, *shingleK)
+	fmt.Printf("%s\n", shingles)
 }
 
 func doLSH(cmd *flag.FlagSet) {
 	parseCommand(cmd)
 
-	shingleSets := shingleSets(toSourceList(*lshSources), false)
+	shingleSets, avgSize := shingleSets(toSourceList(*lshSources), false)
 	if len(shingleSets) < 2 {
 		fmt.Printf("nothing to compare, got %d shingle set(s)\n", len(shingleSets))
 		os.Exit(0)
 	}
-	fmt.Printf("\nhashing %d sets\n\n", len(shingleSets))
 
-	signatureMatrix := lsh.Minhash(shingleSets, *lshNumHashes)
-	bandBuckets := lsh.LSH(signatureMatrix, 1)
+	fmt.Printf("\naverage shingle set size is %d\n", avgSize)
+
+	fmt.Printf("\nhashing %d sets\n", len(shingleSets))
+
+	numHashes := *lshNumHashes
+	if numHashes == 0 {
+		numHashes = lsh.SuggestHashNum(avgSize)
+	}
+
+	numBands := *lshNumBands
+	if numBands == 0 {
+		numBands = numHashes / 5
+	}
+
+	if numBands == 0 {
+		numBands = 1
+	}
+
+	fmt.Printf("\napplying %d hash functions\n", numHashes)
+	signatureMatrix := lsh.Minhash(shingleSets, numHashes)
+
+	fmt.Printf("\ndistributing into %d bands\n", numBands)
+	bandBuckets := lsh.LSH(signatureMatrix, numBands)
 	candidates := bandBuckets.FindCandidates()
 
-	fmt.Printf("found %d candidate pair(s)\n", len(candidates.Index))
+	fmt.Printf("\nfound %d candidate pair(s)\n", len(candidates.Index))
 	if len(candidates.Index) > 0 {
 		fmt.Printf("%v\n", candidates.Keys())
 	}
@@ -177,7 +213,11 @@ func getTextLines(source string) []string {
 		return []string{}
 	}
 
-	return parseHTML(lines, false)
+	if strings.HasPrefix(source, "http://") || strings.HasPrefix(source, "https://") {
+		return parseHTML(lines, false)
+	}
+
+	return lines
 }
 
 func toSourceList(sources string) []string {
