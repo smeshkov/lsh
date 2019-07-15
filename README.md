@@ -56,6 +56,10 @@ similarity: 1.0000
 
 - [x] Jaccard
 
+### Examples
+
+- [ ] add example use cases as a `main.go` files into the repo
+
 ### Performance tests
 
 TODO.

@@ -43,7 +43,7 @@ func (scm *SetsComputeMatrix) String() string {
 	return sb.String()
 }
 
-// SignatureMatrix ...
+// SignatureMatrix - each row represents a hash function and each column represents a set.
 type SignatureMatrix [][]float64
 
 func (sm SignatureMatrix) String() string {

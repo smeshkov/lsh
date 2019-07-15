@@ -27,10 +27,11 @@ func Test_LSH_equalCandidates(t *testing.T) {
 	}
 
 	buckets := LSH(Minhash(equalShingles, 5), 1)
+	candidates := buckets.FindCandidates()
 
-	assert.Equal(t, 1, len(buckets.FindCandidates().Index))
+	assert.Equal(t, 1, len(candidates.Index))
 
-	pair, ok := buckets.FindCandidates().Index["0_2"]
+	pair, ok := candidates.Index["0_2"]
 	assert.True(t, ok)
 	assert.Equal(t, 0, pair.A)
 	assert.Equal(t, 2, pair.B)
@@ -44,10 +45,11 @@ func Test_LSH_similarCandidates(t *testing.T) {
 	}
 
 	buckets := LSH(Minhash(similarShingles, 5), 3)
+	candidates := buckets.FindCandidates()
 
-	assert.Equal(t, 1, len(buckets.FindCandidates().Index))
+	assert.Equal(t, 1, len(candidates.Index))
 
-	pair, ok := buckets.FindCandidates().Index["0_2"]
+	pair, ok := candidates.Index["0_2"]
 	assert.True(t, ok)
 	assert.Equal(t, 0, pair.A)
 	assert.Equal(t, 2, pair.B)
