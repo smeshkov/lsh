@@ -9,6 +9,8 @@ Finding similar items with "Locality-Sensitive Hashing". Inspired by Chapter 3: 
 
 # Usage
 
+See [examples](https://github.com/smeshkov/lsh/tree/master/examples) for use cases.
+
 Steps in code:
 
 1. #Shingle - tokenize
