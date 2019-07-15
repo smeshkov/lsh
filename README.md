@@ -13,10 +13,10 @@ See [examples](https://github.com/smeshkov/lsh/tree/master/examples) for use cas
 
 Steps in code:
 
-1. #Shingle - tokenize
-2. #Minhash - signature matrix
-3. #LSH - candidate pairs
-3. #Jaccard - for jaccard similarity of candidate pairs
+1. `#Shingle` - tokenize
+2. `#Minhash` - signature matrix
+3. `#LSH` - candidate pairs
+3. `#Jaccard` - for jaccard similarity of candidate pairs
 
 in CLI: `./lsh lsh -s <comma_separated_URLs>`. For example:
 
@@ -31,6 +31,10 @@ hashing 2 sets
 found 1 candidate pair(s)
 [0_1]
 ```
+
+This means that sources 0 and 1 ended up as a candidate pair, 
+therefore they are suggested for similarity test.
+
 
 Then `./lsh sim -s <two_comma_separated_URLs>`. For example:
 
