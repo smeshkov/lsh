@@ -9,14 +9,13 @@ import (
 // HashFunc is a hash function.
 type HashFunc func(int, int) int
 
-// HashPattern is a specific pattern of hash functions,
-// e.g. (x + 1) % numBuckets.
-type HashPattern func(vars ...int) HashFunc
-
 // Hasher is a holder of the specific hash function.
 type Hasher struct {
+	// related hash function
 	hf HashFunc
-	t  string
+
+	// string representation of the function
+	t string
 }
 
 // Hash retrurns hash function of the hasher.
@@ -140,7 +139,8 @@ var Modulus = &Hasher{
 	t: "x % numBuckets",
 }
 
-// NewPatternX creates new hash function with provided multipier and coefficient based on pattern X.
+// NewPatternX creates new hash function with provided multipier
+// and coefficient based on pattern X.
 func NewPatternX(multipier, coefficient int) *Hasher {
 	return &Hasher{
 		hf: func(x, numBuckets int) int {
@@ -160,7 +160,8 @@ func NewAnd(multipier int) *Hasher {
 	}
 }
 
-// NewBitShift creates new hash function with provided multipier and "ANDer" that utilizes bitshift under the hood.
+// NewBitShift creates new hash function with provided multipier
+// and "ANDer" that utilizes bitshift under the hood.
 func NewBitShift(multipier, ander int) *Hasher {
 	return &Hasher{
 		hf: func(x, numBuckets int) int {

@@ -153,11 +153,11 @@ func doLSH(cmd *flag.FlagSet) {
 
 	fmt.Printf("\ndistributing into %d bands\n", numBands)
 	bandBuckets := lsh.LSH(signatureMatrix, numBands)
-	candidates := bandBuckets.FindCandidates()
+	candidatePairs := bandBuckets.FindCandidatePairs()
 
-	fmt.Printf("\nfound %d candidate pair(s)\n", len(candidates.Index))
-	if len(candidates.Index) > 0 {
-		fmt.Printf("%v\n", candidates.Keys())
+	fmt.Printf("\nfound %d candidate pair(s)\n", len(candidatePairs.Index))
+	if len(candidatePairs.Index) > 0 {
+		fmt.Printf("%v\n", candidatePairs.Keys())
 	}
 }
 

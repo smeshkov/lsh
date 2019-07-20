@@ -8,23 +8,45 @@ import (
 
 func main() {
 
+	// 0. rember the order of documents
+	// * textA - 0
+	// * textB - 1
+	// * textC - 2
+	docsToIndex := map[string]int{
+		"textA": 0,
+		"textB": 1,
+		"textC": 2,
+	}
+	indexToDocs := []string{
+		"textA",
+		"textB",
+		"textC",
+	}
+
 	// 1. get shingles from given texts
 	aShingles := lsh.Shingle(textA)
 	bShingles := lsh.Shingle(textB)
 
-	// 2. minhash given shingles to get signature matrix
-	signatureMatrix := lsh.Minhash([][]string{aShingles, bShingles}, 10)
+	// 2. build a sets matrix which will serve as an index
+	setsMatrix := lsh.ToSetsMatrix([][]string{aShingles, bShingles})
 
-	// 3. perform LSH on the built signature matrix
-	bandBuckets := lsh.LSH(signatureMatrix, 3)
+	// 3. create an instance of search based on "setsMatrix" as an index
+	search := lsh.NewSearch(lsh.Index(setsMatrix))
 
-	// 4. find candidate pairs in the return buckets
-	candidatePairs := bandBuckets.FindCandidatePairs()
+	// 4. find all candidates
+	allCandidates := search.Find(textC)
+
+	// 5. "textA" is document 0, "textB" is document 1,
+	// "textC" is document 2 (hence the order of adding),
+	// therefore get all candidates for document 2 sorted by elections.
+	candidates := allCandidates.GetByKeySorted(docsToIndex["textC"])
 
 	// 5. print results
-	fmt.Printf("found %d candidate pair(s)\n", len(candidatePairs.Index))
-	if len(candidatePairs.Index) > 0 {
-		fmt.Printf("%v\n", candidatePairs.Keys())
+	fmt.Printf("found %d candidates\n", len(candidates))
+	if len(candidates) > 0 {
+		for k, v := range candidates {
+			fmt.Printf("[%d] %v\n", k, indexToDocs[v.Index])
+		}
 	}
 }
 
@@ -50,4 +72,7 @@ var (
 		"An official Switch system comparison website is now live.",
 		"Watch a trailer below.",
 	}
+
+	// query for search
+	textC = "colors of Nintendo Switch Lite"
 )

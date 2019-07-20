@@ -25,7 +25,7 @@ func Test_ToSetsMatrix(t *testing.T) {
 	assert.Equal(t, setsMatrix.setsNum, len(shingles))
 
 	// Assert that number of rows in setsMatrix is the length of the union of provided unique sets of shingles
-	assert.Equal(t, setsMatrix.rowsNum, len(intersection))
+	assert.Equal(t, setsMatrix.ShinglesNum(), len(intersection))
 
 	// Assert that 1st and 2nd sets have the same entry for shingle - "is good for"
 	assert.True(t, setsMatrix.m["is good for"][0])
@@ -43,7 +43,7 @@ func Test_ToSetsMatrix2(t *testing.T) {
 	assert.Equal(t, setsMatrix.setsNum, 4)
 
 	// Assert that number of rows in setsMatrix is the length of the intersection of provided sets of shingles
-	assert.Equal(t, setsMatrix.rowsNum, 5)
+	assert.Equal(t, setsMatrix.ShinglesNum(), 5)
 
 	// "a" is in set1 and set4
 	assert.True(t, setsMatrix.m["a"][0])
@@ -87,7 +87,7 @@ func Test_ToSetsComputeMatrix(t *testing.T) {
 		setsNum: 4,
 	}
 
-	actual := ToSetsComputeMatrix(simpleShingles)
+	actual := ToSetsComputeMatrix(ToSetsMatrix(simpleShingles))
 
 	assert.Equal(t, expected.rowsNum, actual.rowsNum)
 	assert.Equal(t, expected.setsNum, actual.setsNum)
