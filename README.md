@@ -1,4 +1,4 @@
-# LSH (Work-In-Progress)
+# LSH (Locality-Sensitive Hashing)
 
 [![Build Status](https://travis-ci.com/smeshkov/lsh.svg?branch=master)](https://travis-ci.com/smeshkov/lsh)
 [![Go Report Card](https://goreportcard.com/badge/github.com/smeshkov/lsh)](https://goreportcard.com/report/github.com/smeshkov/lsh)
