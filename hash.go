@@ -15,7 +15,7 @@ type Hasher struct {
 	hf HashFunc
 
 	// string representation of the function
-	t string
+	s string
 }
 
 // Hash retrurns hash function of the hasher.
@@ -24,27 +24,27 @@ func (h *Hasher) Hash() HashFunc {
 }
 
 func (h *Hasher) String() string {
-	return h.t
+	return h.s
 }
 
 // SuggestHashNum suggests number of generated hashes based on the average number of shingles.
 func SuggestHashNum(avgNumOfShingles int) int {
 	if avgNumOfShingles <= 100 {
-		return 5
-	} else if avgNumOfShingles > 100 && avgNumOfShingles <= 150 {
-		return 10
-	} else if avgNumOfShingles > 150 && avgNumOfShingles <= 300 {
 		return 20
-	} else if avgNumOfShingles > 300 && avgNumOfShingles <= 400 {
+	} else if avgNumOfShingles > 100 && avgNumOfShingles <= 150 {
+		return 25
+	} else if avgNumOfShingles > 150 && avgNumOfShingles <= 300 {
 		return 30
+	} else if avgNumOfShingles > 300 && avgNumOfShingles <= 400 {
+		return 35
 	} else if avgNumOfShingles > 400 && avgNumOfShingles <= 550 {
 		return 40
 	} else if avgNumOfShingles > 550 && avgNumOfShingles <= 700 {
-		return 50
+		return 45
 	} else if avgNumOfShingles > 700 && avgNumOfShingles <= 800 {
-		return 60
+		return 50
 	} else if avgNumOfShingles > 800 && avgNumOfShingles <= 900 {
-		return 70
+		return 60
 	} else if avgNumOfShingles > 900 && avgNumOfShingles <= 1000 {
 		return 80
 	} else if avgNumOfShingles > 1000 && avgNumOfShingles <= 1200 {
@@ -60,9 +60,8 @@ func GenerateHashers(amount int) []*Hasher {
 	seen := make(map[string]bool)
 
 	// simple modulus func is 1st
-	modulus := Modulus
-	hashers[0] = modulus
-	seen[modulus.String()] = true
+	hashers[0] = Modulus
+	seen[Modulus.String()] = true
 
 	amountOfPatterns := 3
 
@@ -136,7 +135,23 @@ var Modulus = &Hasher{
 	hf: func(x, numBuckets int) int {
 		return x % numBuckets
 	},
-	t: "x % numBuckets",
+	s: "x % numBuckets",
+}
+
+// AND is a simple AND function, it applies binary AND to given variable with MaxInt64.
+var AND = &Hasher{
+	hf: func(x, ignored int) int {
+		return x & math.MaxInt64
+	},
+	s: "x & maxInt",
+}
+
+// OR is a simple OR function, it applies binary OR to given variable with MaxInt64.
+var OR = &Hasher{
+	hf: func(x, ignored int) int {
+		return x | math.MaxInt64
+	},
+	s: "x | maxInt",
 }
 
 // NewPatternX creates new hash function with provided multipier
@@ -146,7 +161,7 @@ func NewPatternX(multipier, coefficient int) *Hasher {
 		hf: func(x, numBuckets int) int {
 			return (multipier*x + coefficient) % numBuckets
 		},
-		t: fmt.Sprintf("(%d * x + %d) mod numBuckets", multipier, coefficient),
+		s: fmt.Sprintf("(%d * x + %d) mod numBuckets", multipier, coefficient),
 	}
 }
 
@@ -156,7 +171,7 @@ func NewAnd(multipier int) *Hasher {
 		hf: func(x, numBuckets int) int {
 			return int(math.Abs(float64((multipier*x + x&math.MaxInt32) % numBuckets)))
 		},
-		t: fmt.Sprintf("(%d * x + x & maxInt) mod numBuckets", multipier),
+		s: fmt.Sprintf("(%d * x + x & maxInt) mod numBuckets", multipier),
 	}
 }
 
@@ -167,7 +182,7 @@ func NewBitShift(multipier, ander int) *Hasher {
 		hf: func(x, numBuckets int) int {
 			return (((x * multipier) >> 28) & ander) % numBuckets
 		},
-		t: fmt.Sprintf("(((x * %d) >> 28) & %d) mod numBuckets", multipier, ander),
+		s: fmt.Sprintf("(((x * %d) >> 28) & %d) mod numBuckets", multipier, ander),
 	}
 }
 

@@ -184,6 +184,6 @@ func minhashSetsMatrix(setsMatrix *SetsMatrix, hashers []*Hasher) SignatureMatri
 
 func checkWriteStringError(ignored int, err error) {
 	if err != nil {
-		panic(fmt.Sprintf("error in building a string from SetsComputeMatrix: %v", err))
+		panic(fmt.Errorf("error in building a string from SetsComputeMatrix: %w", err))
 	}
 }

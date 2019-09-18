@@ -1,6 +1,7 @@
 package lsh
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -111,7 +112,7 @@ func KShingle(lines []string, k int) []string {
 				_, err := sb.WriteRune(char)
 				if err != nil {
 					// unexpected -> panic
-					panic(err)
+					panic(fmt.Errorf("error in writing character to strings.Builder: %w", err))
 				}
 
 				if sb.Len() == k {

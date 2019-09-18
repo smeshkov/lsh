@@ -31,7 +31,11 @@ var (
 	}
 )
 
-// Search ...
+// Search is a naive implementation of the LSH based search,
+// it is naive because it doesn't utilise idea of nearest points in space,
+// i.e. it re-hashes whole world to find similar objects to given queery,
+// instead of only processing representatives of each groups aka cluster centers or
+// just central points of each of the clusters.
 type Search struct {
 	hashers  []*Hasher
 	bandsNum int

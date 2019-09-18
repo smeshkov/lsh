@@ -8,15 +8,7 @@ import (
 
 func main() {
 
-	// 0. rember the order of documents
-	// * textA - 0
-	// * textB - 1
-	// * textC - 2
-	docsToIndex := map[string]int{
-		"textA": 0,
-		"textB": 1,
-		"textC": 2,
-	}
+	// 0. remember the order of documents
 	indexToDocs := []string{
 		"textA",
 		"textB",
@@ -31,15 +23,17 @@ func main() {
 	setsMatrix := lsh.ToSetsMatrix([][]string{aShingles, bShingles})
 
 	// 3. create an instance of search based on "setsMatrix" as an index
-	search := lsh.NewSearch(lsh.Index(setsMatrix))
+	search := lsh.NewSearch(
+		lsh.Index(setsMatrix),
+	)
 
 	// 4. find all candidates
-	allCandidates := search.Find(textC)
+	allCandidates := search.Find(query)
 
 	// 5. "textA" is document 0, "textB" is document 1,
 	// "textC" is document 2 (hence the order of adding),
 	// therefore get all candidates for document 2 sorted by elections.
-	candidates := allCandidates.GetByKeySorted(docsToIndex["textC"])
+	candidates := allCandidates.GetByKeySorted(len(indexToDocs))
 
 	// 5. print results
 	fmt.Printf("found %d candidates\n", len(candidates))
@@ -74,5 +68,5 @@ var (
 	}
 
 	// query for search
-	textC = "colors of Nintendo Switch Lite"
+	query = "colors of Nintendo Switch Lite"
 )
