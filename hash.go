@@ -1,6 +1,8 @@
 package lsh
 
 import (
+	"encoding/binary"
+	"crypto/md5"
 	"fmt"
 	"math"
 	"math/rand"
@@ -169,6 +171,14 @@ func NewBitShift(multipier, ander int) *Hasher {
 		},
 		t: fmt.Sprintf("(((x * %d) >> 28) & %d) mod numBuckets", multipier, ander),
 	}
+}
+
+// NewMD5 ...
+func NewMD5() int {
+	hasher := md5.New()
+	hasher.Write([]byte(text))
+	bytes := hasher.Sum(nil)
+	return int(binary.BigEndian.Uint32(bytes) ^ 636192)
 }
 
 func toOdd(k int) int {
